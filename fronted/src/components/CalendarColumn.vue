@@ -9,11 +9,11 @@
     </div>
 
     <div class="calendar-column-body">
-      <div class="calendar-time" v-for="n in 24" :key="`${n}`">
-        {{ n }}:00
+      <div class="calendar-time" v-for="n in 24" :key="`${n-1}`">
+        {{ n-1 }}:00
       </div>
       <div class="calendar-eventgrid">
-        <div class="index" v-if="new Date().getDay() === day.getDay()" :style="{ top: scrollPercent + '%' }"></div>
+        <div class="index" v-if="new Date().getDay() === day.getDay()" :style="{ }"></div>
 
         <calendar-event v-for="(e, index) in positioning" :key="index" :data="e"></calendar-event>
       </div>
@@ -46,6 +46,7 @@ export default {
   computed: {
     positioning() {
       if (!this.data) return []
+      console.log(this.data)
       return [...this.data]
         .sort((a, b) =>
           fn.isSame(a.grid.start, b.grid.start)
@@ -54,9 +55,9 @@ export default {
         )
         .map(item => {
           let block = this.data.filter(
-            i =>
-              fn.isBefore(i.grid.start, item.grid.start) &&
-              fn.isAfter(i.grid.end, item.grid.start)
+            elem =>
+              fn.isBefore(elem.grid.start, item.grid.start) &&
+              fn.isAfter(elem.grid.end, item.grid.start)
           )
           if (block.length == 0) {
             item.grid["indent"] = 0
@@ -100,7 +101,7 @@ export default {
 
 <style scoped lang="scss">
 .calendar-column {
-  height: inherit;
+  height: 90%;
   z-index: 3;
 
   &.border-left {
@@ -127,7 +128,7 @@ export default {
 
   .calendar-column-body {
     position: relative;
-    height: 100%;
+    // height: 100%;
 
     .calendar-column-body-slotgrid,
     .calendar-eventgrid,

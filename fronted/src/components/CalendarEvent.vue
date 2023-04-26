@@ -1,6 +1,6 @@
 <template>
-  <div class="calendar-event" :style="getPos(data.grid)" :class="{ selected: opened }">
-    <div class="cal-event-content" :style="getColor" @click="opened = !opened">
+  <div class="calendar-event" :style="getPos(data.grid)">
+    <div class="cal-event-content" :style="getColor">
       {{ data.e.summary }}
     </div>
   </div>
@@ -16,7 +16,7 @@ export default {
   },
   data() {
     return {
-      opened: true
+      opened: false
     }
   },
   computed: {
@@ -141,12 +141,7 @@ export default {
     transform: scale(1.025);
   }
 
-  &.selected {
-    transition: all 250ms;
-    z-index: 100;
-    min-height: 40px;
-    box-shadow: 5px 5px 20px 0px rgba(109, 126, 135, 0.56);
-  }
+
 
   .cal-event-content {
     width: 100%;

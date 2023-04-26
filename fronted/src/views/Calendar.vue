@@ -1,55 +1,93 @@
 <template>
-  <CalendarInput />
-  <div class="calendar" ref="calendar">
-    <CalendarColumn v-for="(value, name, index) in concatenatedData" :key="name" :data="value" :day="days[index]"
-      :precision="precision" />
-  </div>
+  <CalendarInput @changeDay="reloadColumns" />
+  <CalendarWeek :key="reload" ref="calendar" :selected="selected_day" :concatenatedData="weekData" :precision="precision">
+  </CalendarWeek>
+  />
 </template>
 
 <script>
-import CalendarColumn from "../components/CalendarColumn.vue"
 import CalendarInput from "../components/CalendarInput.vue"
+import CalendarWeek from "../components/CalendarWeek.vue"
 
 import * as fn from "../utils"
 
 export default {
   name: "calendar",
-  components: { CalendarColumn, CalendarInput },
-  props: {
-    precision: { type: Number, default: 30 },
+  components: { CalendarWeek, CalendarInput },
+  data() {
+    return {
+      // reload: { type: Number, default: () => 0 },
+      selected_day: new Date(),
+      // data: Array(),
+      data: [
+        {
+          id: "test-user2e@test-email.ai",
+          summary: "description ....",
+          color: "#cd74e6",
+          dates: [
+            {
+              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
+              summary: "event name",
+              start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
+              end: { dateTime: new Date(2023, 3, 26, 23, 59, 0) }
+            },
+            {
+              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
+              summary: "event2",
+              start: { dateTime: new Date(2023, 3, 26, 1, 0, 0) },
+              end: { dateTime: new Date(2023, 3, 26, 5, 59, 0) }
+            }
+          ]
+        },
+        {
+          id: "test-user2e@test-email.ai",
+          summary: "description ....",
+          color: "red",
+          dates: [
+            {
+              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
+              summary: "event name",
+              start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
+              end: { dateTime: new Date(2023, 3, 26, 23, 59, 0) }
+            },
 
-    data: Array,
-    selected: { type: Date, default: () => new Date() }
+          ]
+        }
+      ]
+    }
+  },
+  props: {
+    precision: { type: Number, default: 1 },
+    // selected_day: { type: Date, default: () => new Date() }
   },
 
   mounted() {
   },
+  methods: {
+    reloadColumns(day) {
+      this.selected_day = day.date
 
+      // this.reload += 1
+    }
+  },
   computed: {
-    days() {
-      let result = []
 
-      for (var i = 0; i < 7; i++) {
-        result.push(fn.addDays(fn.getMonday(new Date()), i))
-      }
-      return result
-    },
-    concatenatedData() {
+    weekData() {
       const roundTime = t => {
         let m = t.getMinutes()
         let h = t.getHours()
 
         let i = 1
-        let ceil = 0
-        while (this.precision * i < 60) {
-          ceil = this.precision * i
-          i++
-        }
+        // let ceil = 0
+        // while (this.precision * i < 60) {
+        //   ceil = this.precision * i
+        //   i++
+        // }
 
-        if (m > ceil) h++
-        m =
-          ((((m + this.precision / 2) / this.precision) | 0) * this.precision) %
-          60
+        // if (m > ceil) h++
+        // m =
+        //   ((((m + this.precision / 2) / this.precision) | 0) * this.precision) %
+        //   60
 
         t.setHours(h)
         t.setMinutes(m)
@@ -113,6 +151,7 @@ export default {
                 })
               )
             if (multievent.length > 1) {
+              console.log('MMMM')
               let existAlready = tmp[weekday].find(t => t.id == date.id)
               if (!existAlready) {
                 e.color = multievent
@@ -121,25 +160,10 @@ export default {
             } else tmp[weekday].push(e)
           })
         )
-
       return tmp
     }
   }
 }
 </script>
 
-<style scoped lang="scss">
-.calendar {
-  display: grid;
-  width: 75%;
-  margin-left: auto;
-  margin-right: 20px;
-  color: rgb(161, 153, 153);
 
-  height: 100%;
-  // user-select: none;
-
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: 300%;
-}
-</style>

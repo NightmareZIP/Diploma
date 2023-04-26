@@ -1,5 +1,5 @@
 export const diffMinutes = (dt2, dt1) => {
-  var diff = (dt2.getTime() - dt1.getTime()) / 1000
+  let diff = (dt2.getTime() - dt1.getTime()) / 1000
   diff /= 60
   return Math.abs(Math.round(diff))
 }
@@ -17,7 +17,7 @@ export const isSame = (d1, d2) => {
 
 export const getMonday = d => {
   d = new Date(d)
-  var day = d.getDay(),
+  let day = d.getDay(),
     diff = d.getDate() - day + (day == 0 ? -6 : 1)
   return new Date(d.setDate(diff))
 }
