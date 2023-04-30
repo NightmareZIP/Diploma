@@ -3,36 +3,48 @@
   <CalendarWeek :key="reload" ref="calendar" :selected="selected_day" :concatenatedData="weekData" :precision="precision">
   </CalendarWeek>
   />
+  <EventPopup v-if="show_popup" />
 </template>
 
 <script>
 import CalendarInput from "../components/CalendarInput.vue"
 import CalendarWeek from "../components/CalendarWeek.vue"
+import EventPopup from "../components/EventPopup.vue"
+
 
 import * as fn from "../utils"
 
 export default {
   name: "calendar",
-  components: { CalendarWeek, CalendarInput },
+  components: { CalendarWeek, CalendarInput, EventPopup },
   data() {
     return {
       // reload: { type: Number, default: () => 0 },
       selected_day: new Date(),
+      // show_popup: false,
+      show_popup: true,
+
       // data: Array(),
       data: [
         {
-          id: "test-user2e@test-email.ai",
-          summary: "description ....",
-          color: "#cd74e6",
+          // id: "test-user2e@test-email.ai",
+          // summary: "description ....",
+          // color: "#cd74e6",
           dates: [
             {
               id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
+              color: "#cd74e6",
+              type: 'TASK',
+              description: 'DESC',
               summary: "event name",
               start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
               end: { dateTime: new Date(2023, 3, 26, 23, 59, 0) }
             },
             {
               id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
+              color: "#cd74e6",
+              type: 'ABSCENCE',
+              description: 'DESC',
               summary: "event2",
               start: { dateTime: new Date(2023, 3, 26, 1, 0, 0) },
               end: { dateTime: new Date(2023, 3, 26, 5, 59, 0) }
@@ -42,9 +54,10 @@ export default {
         {
           id: "test-user2e@test-email.ai",
           summary: "description ....",
-          color: "red",
           dates: [
             {
+              color: "red",
+
               id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
               summary: "event name",
               start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
@@ -117,7 +130,7 @@ export default {
 
             let e = {
               id: date.id,
-              color: person.color,
+              color: date.color,
 
               owner: person,
               e: date,

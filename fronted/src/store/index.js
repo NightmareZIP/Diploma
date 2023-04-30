@@ -7,7 +7,20 @@ export default createStore({
       username: '',
     },
     isAuthenticated: false,
-    token: ''
+    token: '',
+    event_info: {
+      id: 0,
+      date_start: new Date(),
+      date_end: new Date(),
+      period: 0,
+      is_new: true,
+      type: '',
+      color: '',
+      event_name: "Новое событие",
+      can_edit: true,
+      created_by: 'Вами',
+      members: ['Вы'],
+    },
   },
   getters: {
   },
@@ -37,7 +50,10 @@ export default createStore({
     },
     setUser(state, user) {
       state.user = user
-    }
+    },
+    change_event(state, info) {
+      state.event_info = info
+    },
   },
   actions: {
   },

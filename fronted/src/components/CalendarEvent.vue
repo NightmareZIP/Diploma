@@ -31,13 +31,13 @@ export default {
 
         return luminance > 0.5 ? "#454545" : "#FFFFFF"
       }
-
+      console.log(this.data)
       if (Array.isArray(this.data.color)) {
         return { background: this.multicolor(this.data.color) }
       } else
         return {
-          backgroundColor: this.data.owner.color,
-          color: getContrastColor(this.data.owner.color)
+          backgroundColor: this.data.color,
+          color: getContrastColor(this.data.color)
         }
     }
   },

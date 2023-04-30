@@ -1,16 +1,16 @@
 <template>
-  <nav >
+  <nav>
     <router-link to="/">Главная страница|</router-link>
-    <router-link to="/my-calendar" v-if= !$store.state.isAuthenticated>Мой календарь|</router-link>
+    <router-link to="/my-calendar" v-if=$store.state.isAuthenticated>Мой календарь|</router-link>
     <router-link to="/company-register" v-if=$store.state.isAuthenticated>Зарегестрировать компанию|</router-link>
 
     <router-link to="/register" v-if=!$store.state.isAuthenticated>Зарегестрироваться|</router-link>
     <router-link to="/login" v-if=!$store.state.isAuthenticated>Авторизоваться|</router-link>
     <router-link to="/profile" v-if=$store.state.isAuthenticated>{{ this.$store.state.user.username }}|</router-link>
-    <router-link id = 'logout' @click="logout()" to="/" v-if=$store.state.isAuthenticated>Выйти|</router-link>
+    <router-link id='logout' @click="logout" to='' v-if=$store.state.isAuthenticated>Выйти|</router-link>
 
   </nav>
-  <router-view/>
+  <router-view />
 </template>
 
 <script>
@@ -57,6 +57,7 @@ export default {
 </script>
 <style lang="scss">
 @import "../node_modules/bulma";
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -77,7 +78,8 @@ nav {
     }
   }
 }
-#logout{
-    color: #2c3e50;
+
+#logout {
+  color: #2c3e50;
 }
 </style>

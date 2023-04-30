@@ -5,37 +5,37 @@
                 <h1 class="title">Авторизация</h1>
 
                 <form @submit.prevent="submitForm">
-                <div class="field">
-                    <label>E-mail</label>
-                    <div class="control">
-                        <input type="email" name="username" class="input" v-model="username">
+                    <div class="field">
+                        <label>E-mail</label>
+                        <div class="control">
+                            <input type="email" name="username" class="input" v-model="username">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <label>Пароль</label>
-                    <div class="control">
-                        <input type="password" name="password" class="input" v-model="password">
+                    <div class="field">
+                        <label>Пароль</label>
+                        <div class="control">
+                            <input type="password" name="password" class="input" v-model="password">
+                        </div>
                     </div>
-                </div>
 
-                <div class="notification is-danger" v-if="errors.length">
-                    <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-                </div>
-
-                <div class="field">
-                    <div class="control">
-                        <button class="button is-success">Войти</button>
+                    <div class="notification is-danger" v-if="errors.length">
+                        <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
                     </div>
-                </div>
-            </form>
 
-            <hr>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-success">Войти</button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr>
 
                 <router-link to="/sign-up">Зарегестрироваться</router-link>
+            </div>
         </div>
     </div>
-</div>
 </template >
 
 <script>
