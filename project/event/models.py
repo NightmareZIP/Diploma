@@ -2,6 +2,11 @@ from django.db import models
 from worker.models import Worker
 
 
+class EventType(models.Model):
+    color = models.CharField(max_length=10)
+    name = models.CharField(max_length=255)
+
+
 class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
@@ -10,8 +15,12 @@ class Event(models.Model):
         Worker, related_name='worker_for', on_delete=models.CASCADE)
     comment = models.TextField()
     period = models.IntegerField(default=0)
-    date = models.DateField()
-    time = models.TimeField()
+    date_from = models.DateTimeField()
+    date_to = models.DateTimeField()
+    # TODO add members
+    # members
+    event_type = models.ForeignKey(
+        EventType, related_name='event', on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s' % self.name

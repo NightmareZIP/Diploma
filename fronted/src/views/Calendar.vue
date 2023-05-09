@@ -1,9 +1,9 @@
 <template>
   <CalendarInput @changeDay="reloadColumns" />
-  <CalendarWeek :key="reload" ref="calendar" :selected="selected_day" :concatenatedData="weekData" :precision="precision">
+  <CalendarWeek @newEvent="newEvent" @showPopup="showEvent" :key="reload" ref="calendar" :selected="selected_day"
+    :concatenatedData="weekData" :precision="precision">
   </CalendarWeek>
-  />
-  <EventPopup v-if="show_popup" />
+  <EventPopup @close="show_popup = false" v-if="show_popup" :event_info="event_info" />
 </template>
 
 <script>
@@ -13,16 +13,33 @@ import EventPopup from "../components/EventPopup.vue"
 
 
 import * as fn from "../utils"
+import axios from 'axios'
 
 export default {
   name: "calendar",
   components: { CalendarWeek, CalendarInput, EventPopup },
   data() {
     return {
+      event_info: {
+        id: 0,
+        date_start: new Date(),
+        date_end: new Date(),
+        period: 0,
+        color: '',
+        type: {
+          id: 2,
+          name: 'Больничный',
+          color: 'red',
+        },
+        event_name: "Новое событие",
+        is_new: true,
+        can_edit: true,
+        created_by: 'Вами',
+        members: ['Вы'],
+      },
       // reload: { type: Number, default: () => 0 },
       selected_day: new Date(),
-      // show_popup: false,
-      show_popup: true,
+      show_popup: false,
 
       // data: Array(),
       data: [
@@ -30,57 +47,112 @@ export default {
           // id: "test-user2e@test-email.ai",
           // summary: "description ....",
           // color: "#cd74e6",
-          dates: [
-            {
-              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
-              color: "#cd74e6",
-              type: 'TASK',
-              description: 'DESC',
-              summary: "event name",
-              start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
-              end: { dateTime: new Date(2023, 3, 26, 23, 59, 0) }
-            },
-            {
-              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
-              color: "#cd74e6",
-              type: 'ABSCENCE',
-              description: 'DESC',
-              summary: "event2",
-              start: { dateTime: new Date(2023, 3, 26, 1, 0, 0) },
-              end: { dateTime: new Date(2023, 3, 26, 5, 59, 0) }
-            }
-          ]
+
+          id: "1",
+          color: "#cd74e6",
+          type: {
+            id: 3,
+            name: 'Другое',
+            color: '#cd74e6',
+          }, description: 'DESC',
+          event_name: "Новое событие",
+          date_start: new Date(2023, 3, 26, 3, 0, 0),
+          date_end: new Date(2023, 3, 26, 23, 59, 0),
+          can_edit: true,
+          created_by: 'Вами',
+          members: ['Вы'],
         },
         {
-          id: "test-user2e@test-email.ai",
-          summary: "description ....",
-          dates: [
-            {
-              color: "red",
+          id: "2",
+          event_name: "3adasdasd safsf s ewewr w q",
 
-              id: "7413lef3g1hip8hvk6tbipkqrq_20200917T140000Z",
-              summary: "event name",
-              start: { dateTime: new Date(2023, 3, 26, 3, 0, 0) },
-              end: { dateTime: new Date(2023, 3, 26, 23, 59, 0) }
-            },
+          color: "blue",
+          type: {
+            id: 2,
+            name: 'Больничный',
+            color: 'red',
+          },
+          description: 'DESC',
+          date_start: new Date(2023, 3, 26, 1, 0, 0),
+          date_end: new Date(2023, 3, 26, 5, 59, 0),
+          can_edit: true,
+          created_by: 'Вами',
+          members: ['Вы'],
+        },
+        {
 
-          ]
-        }
-      ]
+
+          color: "red",
+          event_name: "2",
+          type: {
+            id: 1,
+            name: 'Отгул',
+            color: 'blue',
+          },
+          id: "3",
+          date_start: new Date(2023, 3, 26, 3, 0, 0),
+          date_end: new Date(2023, 3, 26, 23, 59, 0),
+          can_edit: true,
+          created_by: 'Вами',
+          members: ['Вы'],
+        },
+      ],
     }
   },
+
   props: {
-    precision: { type: Number, default: 1 },
+    precision: {
+      type: Number, default: 1
+    },
+
     // selected_day: { type: Date, default: () => new Date() }
   },
 
   mounted() {
+    axios
+      .get("/api/v1/event")
+      .then(response => {
+        console, log(responce)
+      })
+      .catch(error => {
+        console.log(JSON.stringify(error))
+      })
   },
   methods: {
+    newEvent(n = 0, time = new Date()) {
+      console.log(n)
+      time.setHours(n, 0, 0)
+      this.event_info = {
+        id: 0,
+        date_start: time,
+        date_end: time,
+        period: 0,
+        color: '',
+        type: '',
+        event_name: "Новое событие",
+        is_new: true,
+        can_edit: true,
+        created_by: 'Вами',
+        members: ['Вы'],
+
+      }
+      this.show_popup = true
+
+    },
     reloadColumns(day) {
       this.selected_day = day.date
 
       // this.reload += 1
+    },
+
+    showEvent(id) {
+      let copy_events = [...this.data]
+      let event = copy_events.filter(e => e.id == id)[0]
+      event.is_new = false
+      this.event_info = event
+
+      this.show_popup = true
+
     }
   },
   computed: {
@@ -120,59 +192,58 @@ export default {
       }
 
       if (this.data)
-        this.data.forEach(person =>
-          person.dates.forEach(date => {
-            let start = new Date(date.start.date || date.start.dateTime)
-            let end = new Date(date.end.date || date.end.dateTime)
-            let weekday = new Date(start)
-              .toLocaleString("default", { weekday: "short" })
-              .toLowerCase()
+        this.data.forEach(date => {
+          let start = new Date(date.date_start.date || date.date_start)
+          let end = new Date(date.date_end.date || date.date_end)
+          let weekday = new Date(start)
+            .toLocaleString("default", { weekday: "short" })
+            .toLowerCase()
 
-            let e = {
-              id: date.id,
-              color: date.color,
+          let e = {
+            id: date.id,
+            color: date.type.color,
 
-              owner: person,
-              e: date,
+            owner: date.created_by,
+            e: date,
 
-              grid: {
-                start: roundTime(start),
-                end:
-                  start.getTime() != end.getTime()
-                    ? roundTime(end)
-                    : roundTime(
-                      end.setMinutes(end.getMinutes(), this.precision)
-                    ),
-                dur:
-                  start.getTime() != end.getTime()
-                    ? Math.round(fn.diffMinutes(end, start) / this.precision)
-                    : Math.round(
-                      (fn.diffMinutes(end, start) + this.precision) /
-                      this.precision
-                    )
-              }
+            grid: {
+              start: roundTime(start),
+              end:
+                start.getTime() != end.getTime()
+                  ? roundTime(end)
+                  : roundTime(
+                    end.setMinutes(end.getMinutes(), this.precision)
+                  ),
+              dur:
+                start.getTime() != end.getTime()
+                  ? Math.round(fn.diffMinutes(end, start) / this.precision)
+                  : Math.round(
+                    (fn.diffMinutes(end, start) + this.precision) /
+                    this.precision
+                  )
             }
+          }
 
-            let multievent = []
-            if (date.attendees)
-              this.data.forEach(p =>
-                p.dates.forEach(i => {
-                  if (date.attendees)
-                    if (i.id === date.id) {
-                      multievent.push(p.color)
-                    }
-                })
-              )
-            if (multievent.length > 1) {
-              console.log('MMMM')
-              let existAlready = tmp[weekday].find(t => t.id == date.id)
-              if (!existAlready) {
-                e.color = multievent
-                tmp[weekday].push(e)
-              }
-            } else tmp[weekday].push(e)
-          })
-        )
+          let multievent = []
+          if (date.attendees)
+            this.data.forEach(p =>
+              p.dates.forEach(i => {
+                if (date.attendees)
+                  if (i.id === date.id) {
+                    multievent.push(p.color)
+                  }
+              })
+            )
+          if (multievent.length > 1) {
+            console.log('MMMM')
+            let existAlready = tmp[weekday].find(t => t.id == date.id)
+            if (!existAlready) {
+              e.color = multievent
+              tmp[weekday].push(e)
+            }
+          } else tmp[weekday].push(e)
+        })
+
       return tmp
     }
   }

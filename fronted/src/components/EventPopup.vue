@@ -36,16 +36,12 @@
                     <div class="field-body">
 
                         <div class="control">
-                            <!-- <datepicker v-model="event_info.date_start" placeholder="European Format ('d-m-Y')"
-                                :config="{ type: 'datetime', lang: 'ru', dateFormat: 'd-m-Y', static: true }">
-                            </datepicker> -->
+
                             <input type="datetime" ref='start' name="start" class="input" v-model="event_info.date_start">
 
                         </div>
                         <div class="control">
-                            <!-- <datepicker v-model="event_info.date_end" placeholder="European Format ('d-m-Y')"
-                                :config="{ type: 'datetime', lang: 'ru', dateFormat: 'd-m-Y', static: true }">
-                            </datepicker> -->
+
                             <input type="datetime" ref='end' name="end" class="input" v-model="event_info.date_end">
 
 
@@ -61,6 +57,22 @@
                             <input type="text" name="period" class="input" v-model="event_info.period">
                         </div>
                     </div>
+                </div>
+                <div class="field is-horizontal has-text-left">
+                    <div class="field-label">
+                        <label>Тип события</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="control">
+                            <div class="select">
+                                <select v-model="event_info.type">
+                                    <option disabled value="">Выберите один из вариантов</option>
+                                    <option v-bind:value="{ number: 1 }">Больничный</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="field has-text-left ">
                     <label class="label ">Участники:</label>
@@ -82,7 +94,7 @@
             </section>
             <footer v-if="event_info.can_edit" class="modal-card-foot">
                 <button class="button is-success" @click="save">Сохранить</button>
-                <button class="button is-danger" @click="delete_event">Сохранить</button>
+                <button class="button is-danger" @click="delete_event">Удалить событие</button>
                 <button class="button" @click="close">Отменить</button>
             </footer>
         </div>
@@ -93,13 +105,15 @@
 
 import bulmaCalendar from '../../node_modules/bulma-calendar/dist/js/bulma-calendar.min.js';
 import Datepicker from 'vue-bulma-datepicker'
+import axios from 'axios'
+
 export default {
     name: "eventpopup",
     components: {
         Datepicker
     },
     props: {
-
+        event_info: {},
         // $store.state.event_info: {
         //     // date_start,
         //     // date_end,
@@ -117,18 +131,30 @@ export default {
     },
     data() {
         return {
-            event_info: this.$store.state.event_info,
+            // event_info: this.$store.state.event_info,
             workers: {
             },
             date: new Date(),
+            types: {},
         }
     },
     mounted() {
+        axios
+            .get('/api/v1/eventtype/')
+            .then(response => {
+                this.types = response.data;
+            })
+            .catch(error => {
+                console.log(JSON.stringify(error))
+            })
+
+
         let options = {
             lang: 'ru',
             displayMode: 'default',
             weekStart: 1,
             startDate: this.event_info.date_start,
+            startTime: this.event_info.date_start,
             todayLabel: "Сегодня",
             nowLabel: "Сейчас",
             validateLabel: "Подтвердить",
@@ -142,6 +168,8 @@ export default {
 
         calendar_start.on('hide', e => (this.event_info.date_start = new Date(e.data.value()) || null))
         options.startDate = this.event_info.date_end
+        options.startTime = this.event_info.date_end
+
         const calendar_end = bulmaCalendar.attach(this.$refs.end, options)[0]
         calendar_end.on('hide', e => (this.event_info.date_end = new Date(e.data.value()) || null))
     },
@@ -149,28 +177,21 @@ export default {
     },
     methods: {
         async save() {
+            let url = '/api/v1/event/'
+            if (this.event_info.id != 0) url += this.event_info.id
             await axios
-                .post("/api/v1/token/change_event/", this.event_info)
+                .post(url, this.event_info)
                 .then(response => {
                     this.$store.commit('change_event', this.event_info)
-
+                    console.log(response)
                 })
                 .catch(error => {
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`)
-                        }
-                        console.log(JSON.stringify(error.response.data))
-                    } else if (error.message) {
-                        console.log(JSON.stringify(error.message))
-                    } else {
-                        console.log(JSON.stringify(error))
-                    }
+                    console.log(JSON.stringify(error))
                 })
         },
         async delete_event() {
             await axios
-                .post("/api/v1/token/delete_event/", this.event_info.id)
+                .delete("/api/v1/event/", this.event_info.id)
                 .then(response => {
                     this.close()
                 })

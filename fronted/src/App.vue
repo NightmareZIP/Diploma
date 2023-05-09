@@ -2,9 +2,9 @@
   <nav>
     <router-link to="/">Главная страница|</router-link>
     <router-link to="/my-calendar" v-if=$store.state.isAuthenticated>Мой календарь|</router-link>
-    <router-link to="/company-register" v-if=$store.state.isAuthenticated>Зарегестрировать компанию|</router-link>
+    <router-link to="/company-register" v-if=!$store.state.isAuthenticated>Зарегестрировать компанию|</router-link>
 
-    <router-link to="/register" v-if=!$store.state.isAuthenticated>Зарегестрироваться|</router-link>
+    <router-link to="/register/1" v-if=!$store.state.isAuthenticated>Зарегестрироваться|</router-link>
     <router-link to="/login" v-if=!$store.state.isAuthenticated>Авторизоваться|</router-link>
     <router-link to="/profile" v-if=$store.state.isAuthenticated>{{ this.$store.state.user.username }}|</router-link>
     <router-link id='logout' @click="logout" to='' v-if=$store.state.isAuthenticated>Выйти|</router-link>

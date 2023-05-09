@@ -9,13 +9,14 @@
     </div>
 
     <div class="calendar-column-body">
-      <div class="calendar-time" v-for="n in 24" :key="`${n-1}`">
-        {{ n-1 }}:00
+      <div class="calendar-time" @click="$emit('newEvent', n - 1, day)" v-for="n in 24" :key="`${n - 1}`">
+        {{ n - 1 }}:00
       </div>
       <div class="calendar-eventgrid">
-        <div class="index" v-if="new Date().getDay() === day.getDay()" :style="{ }"></div>
+        <div class="index" v-if="new Date().getDay() === day.getDay()" :style="{}"></div>
 
-        <calendar-event v-for="(e, index) in positioning" :key="index" :data="e"></calendar-event>
+        <calendar-event @showPopup="(id) => $emit('showPopup', id)" v-for="(e, index) in positioning" :key="index"
+          :data="e"></calendar-event>
       </div>
     </div>
   </div>
@@ -28,6 +29,7 @@ import * as fn from "../utils"
 
 export default {
   name: "calendarcolumn",
+  emits: ['showPopup',],
   components: {
     CalendarEvent
   },
@@ -42,7 +44,9 @@ export default {
       active: true
     }
   },
+  methods: {
 
+  },
   computed: {
     positioning() {
       if (!this.data) return []
@@ -131,7 +135,11 @@ export default {
     // height: 100%;
 
     .calendar-column-body-slotgrid,
-    .calendar-eventgrid,
+    .calendar-eventgrid {
+      z-index: 1;
+
+    }
+
     .calendar-column-body-editgrid {
       position: absolute;
       top: 0;

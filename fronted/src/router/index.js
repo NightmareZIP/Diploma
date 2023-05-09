@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Register from '../views/Register.vue'
+import CompanyRegister from '../views/CompanyRegister.vue'
+
 import Login from '../views/Login.vue'
 import Calendar from '../views/Calendar.vue'
 
@@ -11,7 +13,7 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/register',
+    path: '/register/:companyid',
     name: 'register',
     component: Register
   },
@@ -28,6 +30,12 @@ const routes = [
     component: Calendar
   },
 
+  {
+    path: '/company-register',
+    name: 'company-register',
+
+    component: CompanyRegister
+  },
   {
     path: '/about',
     name: 'about',

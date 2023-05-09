@@ -41,6 +41,9 @@ export default {
 
         }
     },
+    mounted() {
+        
+    },
     methods: {
         change_active(event, day_el) {
             this.date = day_el.date;
@@ -68,7 +71,7 @@ export default {
     },
     computed: {
         calendar() {
-            this.date.setHours(0,0,0,0)
+            this.date.setHours(0, 0, 0, 0)
             let days = []
             let week = 0
             days[week] = []

@@ -1,7 +1,7 @@
 <template>
     <div class="calendar" ref="calendar">
-        <CalendarColumn v-for="(value, name, index) in concatenatedData" :key="name" :data="value" :day="days[index]"
-             />
+        <CalendarColumn @newEvent="(n, day) => $emit('newEvent', n, day)" @showPopup="(id) => $emit('showPopup', id)"
+            v-for="(value, name, index) in concatenatedData" :key="name" :data="value" :day="days[index]" />
     </div>
 </template>
 
@@ -15,7 +15,7 @@ export default {
     components: { CalendarColumn },
     data() {
         return {
-            
+
             // selected: { type: Date, default: () => new Date() },
         }
     },

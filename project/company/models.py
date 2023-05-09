@@ -9,6 +9,7 @@ class Company(models.Model):
     place = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
+    inn = models.CharField(max_length=255, blank=False, null=False)
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$', message="Телефон формата: '+999999999'.")
     contact_phone = models.CharField(

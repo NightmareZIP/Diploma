@@ -1,7 +1,7 @@
 <template>
-  <div class="calendar-event" :style="getPos(data.grid)">
+  <div @click="$emit('showPopup', data.e.id)" class="calendar-event" :style="getPos(data.grid)">
     <div class="cal-event-content" :style="getColor">
-      {{ data.e.summary }}
+      {{ data.e.event_name }}
     </div>
   </div>
 </template>
@@ -139,6 +139,8 @@ export default {
     opacity: 1;
     cursor: pointer;
     transform: scale(1.025);
+    z-index: 10;
+    font-weight: bold;
   }
 
 
@@ -147,12 +149,13 @@ export default {
     width: 100%;
     height: 100%;
     padding: 4px;
-
+    word-wrap: break-word;
+    text-align: auto;
     box-sizing: border-box;
-
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    // display: flex;
+    // align-items: flex-start;
+    // justify-content: flex-start;
     font-size: 1.5vmin;
 
     color: #454545;

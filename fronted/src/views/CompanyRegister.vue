@@ -51,6 +51,55 @@
                             <input type="text" name="country" class="input" v-model="country">
                         </div>
                     </div>
+                    <!-- Данные компании -->
+                    <div class="field">
+                        <label>Название компании</label>
+                        <div class="control">
+                            <input type="text" name="cmp_name" class="input" v-model="company_data.name">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Страна Компании</label>
+                        <div class="control">
+                            <input type="text" name="cmp_country" class="input" v-model="company_data.country">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Адрес</label>
+                        <div class="control">
+                            <input type="text" name="place" class="input" v-model="company_data.place">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Представитель</label>
+                        <div class="control">
+                            <input type="text" name="contact_person" class="input" v-model="company_data.contact_person">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Контактный телефон</label>
+                        <div class="control">
+                            <input type="text" name="contact_phone" class="input" v-model="company_data.contact_phone">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Контактный e-mail</label>
+                        <div class="control">
+                            <input type="text" name="cmp_email" class="input" v-model="company_data.email">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>ИНН</label>
+                        <div class="control">
+                            <input type="text" name="inn" class="input" v-model="company_data.inn">
+                        </div>
+                    </div>
+
 
                     <div class="notification is-danger" v-if="errors.length">
                         <p v-for="error in errors" v-bind:key="error">
@@ -60,7 +109,7 @@
 
                     <div class="field">
                         <div class="control">
-                            <button class="button is-success">Sign up</button>
+                            <button class="button is-success">Зарегестрировать</button>
                         </div>
                     </div>
                 </form>
@@ -76,7 +125,7 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'Register',
+    name: 'CompanyRegister',
     data() {
         return {
             username: '',
@@ -86,7 +135,15 @@ export default {
             surname: '',
             contact_phone: '',
             country: '',
-            company: Number(this.$route.params.companyid),
+            company_data: {
+                name: '',
+                country: '',
+                place: '',
+                contact_person: '',
+                contact_phone: '',
+                email: '',
+                inn: '',
+            },
             errors: []
         }
     },
@@ -153,11 +210,11 @@ export default {
                 email: this.username,
                 contact_phone: this.contact_phone,
                 country: this.country,
-                company: this.$route.params.companyid,
+                company: this.company_data,
             }
             //Создаем самого работника
             await axios
-                .post("/api/v1/workers/", userData)
+                .post("/api/v1/workercompany/", userData)
                 .then(response => {
                     console.log(response)
 

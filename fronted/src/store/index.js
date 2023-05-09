@@ -13,10 +13,11 @@ export default createStore({
       date_start: new Date(),
       date_end: new Date(),
       period: 0,
-      is_new: true,
-      type: '',
       color: '',
+      
+      type: '',
       event_name: "Новое событие",
+      is_new: true,
       can_edit: true,
       created_by: 'Вами',
       members: ['Вы'],
