@@ -6,8 +6,12 @@ class EventType(models.Model):
     color = models.CharField(max_length=10)
     name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return '%s' % self.name
 
 class Event(models.Model):
+    event_name = models.CharField(max_length=50)
+
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         Worker, related_name='worker_by', on_delete=models.CASCADE)
@@ -23,4 +27,4 @@ class Event(models.Model):
         EventType, related_name='event', on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s' % self.name
+        return '%s' % self.event_name

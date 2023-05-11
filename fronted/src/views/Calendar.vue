@@ -20,13 +20,14 @@ export default {
   components: { CalendarWeek, CalendarInput, EventPopup },
   data() {
     return {
+      cur_date: new Date(),
       event_info: {
         id: 0,
-        date_start: new Date(),
-        date_end: new Date(),
+        date_from: new Date(),
+        date_to: new Date(),
         period: 0,
         color: '',
-        type: {
+        event_type: {
           id: 2,
           name: 'Больничный',
           color: 'red',
@@ -36,66 +37,16 @@ export default {
         can_edit: true,
         created_by: 'Вами',
         members: ['Вы'],
+        comment: "A",
       },
-      // reload: { type: Number, default: () => 0 },
+      // reload: { event_type: Number, default: () => 0 },
       selected_day: new Date(),
       show_popup: false,
 
       // data: Array(),
       data: [
-        {
-          // id: "test-user2e@test-email.ai",
-          // summary: "description ....",
-          // color: "#cd74e6",
 
-          id: "1",
-          color: "#cd74e6",
-          type: {
-            id: 3,
-            name: 'Другое',
-            color: '#cd74e6',
-          }, description: 'DESC',
-          event_name: "Новое событие",
-          date_start: new Date(2023, 3, 26, 3, 0, 0),
-          date_end: new Date(2023, 3, 26, 23, 59, 0),
-          can_edit: true,
-          created_by: 'Вами',
-          members: ['Вы'],
-        },
-        {
-          id: "2",
-          event_name: "3adasdasd safsf s ewewr w q",
-
-          color: "blue",
-          type: {
-            id: 2,
-            name: 'Больничный',
-            color: 'red',
-          },
-          description: 'DESC',
-          date_start: new Date(2023, 3, 26, 1, 0, 0),
-          date_end: new Date(2023, 3, 26, 5, 59, 0),
-          can_edit: true,
-          created_by: 'Вами',
-          members: ['Вы'],
-        },
-        {
-
-
-          color: "red",
-          event_name: "2",
-          type: {
-            id: 1,
-            name: 'Отгул',
-            color: 'blue',
-          },
-          id: "3",
-          date_start: new Date(2023, 3, 26, 3, 0, 0),
-          date_end: new Date(2023, 3, 26, 23, 59, 0),
-          can_edit: true,
-          created_by: 'Вами',
-          members: ['Вы'],
-        },
+      
       ],
     }
   },
@@ -109,31 +60,67 @@ export default {
   },
 
   mounted() {
-    axios
-      .get("/api/v1/event")
-      .then(response => {
-        console, log(responce)
-      })
-      .catch(error => {
-        console.log(JSON.stringify(error))
-      })
+    this.getEvents()
   },
   methods: {
+    getEvents() {
+      let params = {
+        date_from: fn.getMonday(this.cur_date).toISOString().split('T')[0],
+        date_to: fn.getSunday(this.cur_date).toISOString().split('T')[0],
+      }
+      axios
+        .get("/api/v1/event/get_events", { params: params })
+        .then(response => {
+          console.log(response.data)
+          let new_data = []
+          Object.values(response.data).forEach(val => {
+            console.log(val)
+            if (val.period == 0) {
+              new_data.push(val)
+            }
+            else {
+              let from = new Date(val.date_from)
+              from.setHours(0, 0, 0, 0)
+              let daters_arr = fn.getDates(fn.getMonday(this.cur_date), fn.getSunday(this.cur_date))
+              daters_arr.forEach(week_date => {
+                if (week_date >= from) {
+                  let dif = Math.abs(week_date - from)
+                  dif = dif / (1000 * 3600 * 24)
+                  if (dif % val.period == 0) {
+                    let val_copy = JSON.parse(JSON.stringify(val));
+                    val_copy.date_from = fn.addDays(new Date(val_copy.date_from), dif)
+                    val_copy.date_to = fn.addDays(new Date(val_copy.date_to), dif)
+
+                    new_data.push(val_copy)
+                  }
+                }
+              })
+            }
+          })
+          console.log(new_data)
+          this.data = new_data
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+
     newEvent(n = 0, time = new Date()) {
       console.log(n)
       time.setHours(n, 0, 0)
       this.event_info = {
         id: 0,
-        date_start: time,
-        date_end: time,
+        date_from: time,
+        date_to: time,
         period: 0,
         color: '',
-        type: '',
+        event_type: '',
         event_name: "Новое событие",
         is_new: true,
         can_edit: true,
         created_by: 'Вами',
         members: ['Вы'],
+        comment: "",
 
       }
       this.show_popup = true
@@ -141,7 +128,8 @@ export default {
     },
     reloadColumns(day) {
       this.selected_day = day.date
-
+      this.cur_date = day.date
+      this.getEvents()
       // this.reload += 1
     },
 
@@ -193,15 +181,15 @@ export default {
 
       if (this.data)
         this.data.forEach(date => {
-          let start = new Date(date.date_start.date || date.date_start)
-          let end = new Date(date.date_end.date || date.date_end)
+          let start = new Date(date.date_from.date || date.date_from)
+          let end = new Date(date.date_to.date || date.date_to)
           let weekday = new Date(start)
             .toLocaleString("default", { weekday: "short" })
             .toLowerCase()
 
           let e = {
             id: date.id,
-            color: date.type.color,
+            color: date.event_type.color,
 
             owner: date.created_by,
             e: date,

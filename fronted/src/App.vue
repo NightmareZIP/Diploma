@@ -7,6 +7,9 @@
     <router-link to="/register/1" v-if=!$store.state.isAuthenticated>Зарегестрироваться|</router-link>
     <router-link to="/login" v-if=!$store.state.isAuthenticated>Авторизоваться|</router-link>
     <router-link to="/profile" v-if=$store.state.isAuthenticated>{{ this.$store.state.user.username }}|</router-link>
+    <router-link to="/company-info" v-if=$store.state.isAuthenticated>Данные компании|</router-link>
+    <router-link to="/workers" v-if=$store.state.isAuthenticated>Ваши коллеги|</router-link>
+
     <router-link id='logout' @click="logout" to='' v-if=$store.state.isAuthenticated>Выйти|</router-link>
 
   </nav>

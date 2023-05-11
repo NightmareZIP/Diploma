@@ -5,6 +5,10 @@ import CompanyRegister from '../views/CompanyRegister.vue'
 
 import Login from '../views/Login.vue'
 import Calendar from '../views/Calendar.vue'
+import Profile from '../views/Profile.vue'
+import CompanyInfo from '../views/CompanyInfo.vue'
+import Workers from '../views/Workers.vue'
+
 
 const routes = [
   {
@@ -29,6 +33,13 @@ const routes = [
 
     component: Calendar
   },
+  
+  {
+    path: '/my-calendar/:id',
+    name: 'my-calendar-id',
+
+    component: Calendar
+  },
 
   {
     path: '/company-register',
@@ -36,6 +47,27 @@ const routes = [
 
     component: CompanyRegister
   },
+
+  {
+    path: '/profile',
+    name: 'profile',
+
+    component: Profile
+  },
+
+  {
+    path: '/company-info',
+    name: 'company-info',
+
+    component: CompanyInfo
+  },
+  {
+    path: '/workers',
+    name: 'workers',
+
+    component: Workers
+  },
+  
   {
     path: '/about',
     name: 'about',

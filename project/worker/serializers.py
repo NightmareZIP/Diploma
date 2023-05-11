@@ -49,7 +49,7 @@ class WorkerCompanySerializer(serializers.ModelSerializer):
 
 
 class WorkerSerializer(serializers.ModelSerializer):
-    # company = CompanySerializer(required=True)
+    company = CompanySerializer(read_only=True, required=False)
 
     class Meta:
         model = Worker

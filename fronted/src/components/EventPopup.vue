@@ -1,7 +1,7 @@
 <template>
     <div class="modal is-active">
         <div class="modal-background"></div>
-        <div class="modal-card" :class="{ disable: !event_info.can_edit }">
+        <div class="modal-card" :class="{ disable: !can_edit }">
             <header class="modal-card-head">
                 <p class="modal-card-title">{{ event_info.event_name }}</p>
                 <button class="delete" aria-label="close" @click="close"></button>
@@ -37,12 +37,12 @@
 
                         <div class="control">
 
-                            <input type="datetime" ref='start' name="start" class="input" v-model="event_info.date_start">
+                            <input type="datetime" ref='start' name="start" class="input" v-model="event_info.date_from">
 
                         </div>
                         <div class="control">
 
-                            <input type="datetime" ref='end' name="end" class="input" v-model="event_info.date_end">
+                            <input type="datetime" ref='end' name="end" class="input" v-model="event_info.date_to">
 
 
                         </div>
@@ -65,11 +65,21 @@
                     <div class="field-body">
                         <div class="control">
                             <div class="select">
-                                <select v-model="event_info.type">
+                                <select v-model="event_info.event_type">
                                     <option disabled value="">Выберите один из вариантов</option>
-                                    <option v-bind:value="{ number: 1 }">Больничный</option>
+                                    <option v-for="(type, index) in types" v-bind:key="index" v-bind:value="type">
+                                        {{ type.name }}</option>
                                 </select>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field has-text-left">
+
+                    <div class="field-body">
+                        <div class="control">
+                            <textarea class="textarea" placeholder="Комментарий" v-model="event_info.comment"></textarea>
+
                         </div>
                     </div>
 
@@ -92,7 +102,7 @@
                     <p>Убедитесь, что поля заоплнены корректно</p>
                 </div>
             </section>
-            <footer v-if="event_info.can_edit" class="modal-card-foot">
+            <footer v-if="can_edit" class="modal-card-foot">
                 <button class="button is-success" @click="save">Сохранить</button>
                 <button class="button is-danger" @click="delete_event">Удалить событие</button>
                 <button class="button" @click="close">Отменить</button>
@@ -104,19 +114,19 @@
 <script>
 
 import bulmaCalendar from '../../node_modules/bulma-calendar/dist/js/bulma-calendar.min.js';
-import Datepicker from 'vue-bulma-datepicker'
+// import Datepicker from 'vue-bulma-datepicker'
 import axios from 'axios'
 
 export default {
     name: "eventpopup",
     components: {
-        Datepicker
+        // Datepicker
     },
     props: {
         event_info: {},
         // $store.state.event_info: {
-        //     // date_start,
-        //     // date_end,
+        //     // date_from,
+        //     // date_to,
         //     // period,
         //     // is_new,
         //     // type,
@@ -136,6 +146,7 @@ export default {
             },
             date: new Date(),
             types: {},
+            can_edit: !this.event_info.created_by.user_id || this.$store.state.user.id == this.event_info.created_by.user_id,
         }
     },
     mounted() {
@@ -153,45 +164,61 @@ export default {
             lang: 'ru',
             displayMode: 'default',
             weekStart: 1,
-            startDate: this.event_info.date_start,
-            startTime: this.event_info.date_start,
+            startDate: new Date(this.event_info.date_from),
+            startTime: new Date(this.event_info.date_from),
             todayLabel: "Сегодня",
             nowLabel: "Сейчас",
             validateLabel: "Подтвердить",
             cancelLabel: "Отменить",
             clearLabel: "Очистить",
             editTimeManually: true,
+            minDate: new Date(this.event_info.date_from),
+            maxDate: new Date(this.event_info.date_to),
+
         }
 
         const calendar_start = bulmaCalendar.attach(this.$refs.start, options)[0]
         console.log(calendar_start);
 
-        calendar_start.on('hide', e => (this.event_info.date_start = new Date(e.data.value()) || null))
-        options.startDate = this.event_info.date_end
-        options.startTime = this.event_info.date_end
+        calendar_start.on('hide', e => (this.event_info.date_from = new Date(e.data.value()) || null))
+        options.startDate = new Date(this.event_info.date_to)
+        options.startTime = new Date(this.event_info.date_to)
 
         const calendar_end = bulmaCalendar.attach(this.$refs.end, options)[0]
-        calendar_end.on('hide', e => (this.event_info.date_end = new Date(e.data.value()) || null))
+        calendar_end.on('hide', e => (this.event_info.date_to = new Date(e.data.value()) || null))
     },
     computed: {
     },
     methods: {
         async save() {
             let url = '/api/v1/event/'
-            if (this.event_info.id != 0) url += this.event_info.id
-            await axios
-                .post(url, this.event_info)
-                .then(response => {
-                    this.$store.commit('change_event', this.event_info)
-                    console.log(response)
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+            if (this.event_info.id != 0) {
+                url += this.event_info.id + '/'
+                await axios
+                    .put(url, this.event_info)
+                    .then(response => {
+                        this.$store.commit('change_event', this.event_info)
+                        console.log(response)
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+            }
+            else {
+                await axios
+                    .post(url, this.event_info)
+                    .then(response => {
+                        this.$store.commit('change_event', this.event_info)
+                        console.log(response)
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+            }
         },
         async delete_event() {
             await axios
-                .delete("/api/v1/event/", this.event_info.id)
+                .delete("/api/v1/event/" + this.event_info.id + '/', this.event_info.id)
                 .then(response => {
                     this.close()
                 })

@@ -19,28 +19,73 @@ class EventTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventType
-        read_only_fields = (
-            'name',
+        # read_only_fields = (
+        #     'name',
+        #     'id',
+        #     'color',
+        # )
+        fields = (
             'id',
             'color',
-        ),
-        fields = "__all__"
+            'name',
+        )
+        extra_kwargs = {'id': {'read_only': False}}
 
 
 class EventSerializer(serializers.ModelSerializer):
-    event_type = EventTypeSerializer()
-    created_by = WorkerSerializer(required=True)
-    created_for = WorkerSerializer(required=True)
+    event_type = EventTypeSerializer(required=True)
+    created_by = WorkerSerializer(read_only=True)
+    created_for = WorkerSerializer(read_only=True, required=False)
 
     class Meta:
         model = Event
+        # extra_kwargs = {
+        #     'created_for': {'read_only': True},
+        #     'created_by': {'read_only': True},
+
+        # }
         read_only_fields = (
             "id",
             "created_at",
-        ),
-    fields = "__all__"
+            "created_for",
+            "created_by",
+        )
+        fields = (
+            "id",
+            "created_at",
+            'event_type',
+            'created_by',
+            'created_for',
+            'date_from',
+            'date_to',
+            'event_name',
+            'period',
+            'comment',
+        )
 
-    # def create(self, validated_data):
+    def create(self, validated_data):
+        print(validated_data)
+        event_type = validated_data['event_type']['id']
+        event_type = EventType.objects.get(id=event_type)
+        validated_data['event_type'] = event_type
+        event = Event.objects.create(**validated_data)
+        event.save()
+        return event
+
+    def update(self, instance, validated_data):
+        print(validated_data)
+        event_type = validated_data['event_type']['id']
+        event_type = EventType.objects.get(id=event_type)
+        validated_data['event_type'] = event_type
+        # if attr in info.relations and info.relations[attr].to_many:
+        #         m2m_fields.append((attr, value))
+        #     else:
+        #         setattr(instance, attr, value)
+        for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+        # event = instance.update(**validated_data)
+        instance.save()
+        return instance
 
     #     return worker
 
