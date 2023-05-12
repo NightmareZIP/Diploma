@@ -3,7 +3,7 @@
   <CalendarWeek @newEvent="newEvent" @showPopup="showEvent" :key="reload" ref="calendar" :selected="selected_day"
     :concatenatedData="weekData" :precision="precision">
   </CalendarWeek>
-  <EventPopup @close="show_popup = false" v-if="show_popup" :event_info="event_info" />
+  <EventPopup @close="getEvents();show_popup = false" v-if="show_popup" :event_info="event_info" :is_head="is_head" />
 </template>
 
 <script>
@@ -20,6 +20,8 @@ export default {
   components: { CalendarWeek, CalendarInput, EventPopup },
   data() {
     return {
+      // user_id: this.$route.params.id ? this.$route.params.id : 0,
+      is_head: false,
       cur_date: new Date(),
       event_info: {
         id: 0,
@@ -46,7 +48,7 @@ export default {
       // data: Array(),
       data: [
 
-      
+
       ],
     }
   },
@@ -60,21 +62,44 @@ export default {
   },
 
   mounted() {
+    if (this.$route.params.id) {
+      this.isHead()
+    }
     this.getEvents()
   },
   methods: {
-    getEvents() {
+    async isHead() {
+      let url = "/api/v1/workers/" + this.$route.params.id + '/'
+      await axios
+        .get(url)
+        .then(response => {
+          // console.log(this.$store.state.worker.id == response.data.head)
+         this.is_head = this.$store.state.worker.id == response.data.head
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    checkRights() {
+      if ((this.$route.params.id && this.$store.state.worker.id != this.$route.params.id) && !this.is_head) {
+        alert("Вы можете изменять только свой календарь и календарь своих подчиненных!")
+        return false
+      }
+      return true
+    },
+    async getEvents() {
       let params = {
         date_from: fn.getMonday(this.cur_date).toISOString().split('T')[0],
         date_to: fn.getSunday(this.cur_date).toISOString().split('T')[0],
       }
-      axios
-        .get("/api/v1/event/get_events", { params: params })
+      if (this.$route.params.id) {
+        params.user_id = this.$route.params.id
+      }
+      await axios
+        .get("/api/v1/event/get_events/", { params: params })
         .then(response => {
-          console.log(response.data)
           let new_data = []
           Object.values(response.data).forEach(val => {
-            console.log(val)
             if (val.period == 0) {
               new_data.push(val)
             }
@@ -97,7 +122,6 @@ export default {
               })
             }
           })
-          console.log(new_data)
           this.data = new_data
         })
         .catch(error => {
@@ -106,7 +130,10 @@ export default {
     },
 
     newEvent(n = 0, time = new Date()) {
-      console.log(n)
+      if (!this.checkRights()) {
+        return false
+      }
+
       time.setHours(n, 0, 0)
       this.event_info = {
         id: 0,
@@ -134,6 +161,9 @@ export default {
     },
 
     showEvent(id) {
+      if (!this.checkRights()) {
+        return false
+      }
       let copy_events = [...this.data]
       let event = copy_events.filter(e => e.id == id)[0]
       event.is_new = false

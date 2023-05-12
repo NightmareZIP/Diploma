@@ -24,7 +24,10 @@
                     <div class="field-body">
 
                         <div class="control">
-                            <p>{{ event_info.created_by }}</p>
+                            <p>
+                                {{ [event_info.created_by.name, event_info.created_by.last_name,
+                                event_info.created_by.surname].join(' ') }}
+                            </p>
                         </div>
                     </div>
 
@@ -84,7 +87,7 @@
                     </div>
 
                 </div>
-                <div class="field has-text-left ">
+                <!-- <div class="field has-text-left ">
                     <label class="label ">Участники:</label>
                     <div class="control">
                         <div class="content">
@@ -97,7 +100,7 @@
                             </ol>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="notification is-danger" v-if="error">
                     <p>Убедитесь, что поля заоплнены корректно</p>
                 </div>
@@ -123,6 +126,7 @@ export default {
         // Datepicker
     },
     props: {
+        is_head: false,
         event_info: {},
         // $store.state.event_info: {
         //     // date_from,
@@ -146,7 +150,7 @@ export default {
             },
             date: new Date(),
             types: {},
-            can_edit: !this.event_info.created_by.user_id || this.$store.state.user.id == this.event_info.created_by.user_id,
+            can_edit: this.event_info.can_edit || this.is_head || this.$store.state.user.id == this.event_info.created_by.user_id,
         }
     },
     mounted() {
@@ -178,7 +182,6 @@ export default {
         }
 
         const calendar_start = bulmaCalendar.attach(this.$refs.start, options)[0]
-        console.log(calendar_start);
 
         calendar_start.on('hide', e => (this.event_info.date_from = new Date(e.data.value()) || null))
         options.startDate = new Date(this.event_info.date_to)
@@ -191,6 +194,9 @@ export default {
     },
     methods: {
         async save() {
+            if (this.$store.state.worker.id) {
+                this.event_info.user_id = this.$route.params.id
+            }
             let url = '/api/v1/event/'
             if (this.event_info.id != 0) {
                 url += this.event_info.id + '/'
@@ -205,11 +211,16 @@ export default {
                     })
             }
             else {
+                if (this.$store.state.worker.id) {
+                    this.event_info.user_id = this.$route.params.id
+                }
                 await axios
                     .post(url, this.event_info)
                     .then(response => {
-                        this.$store.commit('change_event', this.event_info)
+                        // this.$store.commit('change_event', this.event_info)
                         console.log(response)
+                        this.close()
+
                     })
                     .catch(error => {
                         console.log(JSON.stringify(error))
@@ -217,8 +228,16 @@ export default {
             }
         },
         async delete_event() {
+            if (this.$store.state.worker.id) {
+                this.event_info.user_id = this.$route.params.id
+            }
             await axios
-                .delete("/api/v1/event/" + this.event_info.id + '/', this.event_info.id)
+                .delete("/api/v1/event/" + this.event_info.id + '/', {
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    data: { user_id: this.$route.params.id }
+                })
                 .then(response => {
                     this.close()
                 })

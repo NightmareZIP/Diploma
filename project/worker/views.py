@@ -11,6 +11,7 @@ from worker.models import Worker
 from rest_framework import generics
 from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 
 class WorkerCompanyViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -23,16 +24,37 @@ class WorkerCompanyViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class WorkerViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                    mixins.RetrieveModelMixin, viewsets.GenericViewSet,
-                    mixins.UpdateModelMixin, mixins.DestroyModelMixin,):
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet,):
 
     serializer_class = WorkerSerializer
     queryset = Worker.objects.all()
 
+    def get_object(self):
+
+        queryset = self.filter_queryset(Worker.objects.all())
+
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+            'Expected view %s to be called with a URL keyword argument '
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view correctly.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
     def get_queryset(self):
 
         worker_id = get_worker(self.request.user)
-        return self.queryset.filter(id=worker_id)
+        return self.queryset.filter(pk=worker_id)
 
     def perform_create(self, serializer):
         # obj = self.get_object()
@@ -54,11 +76,9 @@ class WorkerViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
     @action(detail=False)
     def get_workers(self, request):
-        # Получим непиродические события
         q_set = self.get_queryset()
         company = self.request.user.worker_user.company
         workers = Worker.objects.all().filter(company=company)
-        print(workers)
         self.check_object_permissions(self.request, workers)
         serializer = self.get_serializer(workers, many=True)
         return Response(serializer.data)

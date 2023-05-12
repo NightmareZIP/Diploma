@@ -36,6 +36,7 @@ class EventSerializer(serializers.ModelSerializer):
     event_type = EventTypeSerializer(required=True)
     created_by = WorkerSerializer(read_only=True)
     created_for = WorkerSerializer(read_only=True, required=False)
+    # user_id = serializers.IntegerField(write_only=True,  required=False)
 
     class Meta:
         model = Event
@@ -61,6 +62,7 @@ class EventSerializer(serializers.ModelSerializer):
             'event_name',
             'period',
             'comment',
+            # 'user_id',
         )
 
     def create(self, validated_data):
@@ -82,7 +84,7 @@ class EventSerializer(serializers.ModelSerializer):
         #     else:
         #         setattr(instance, attr, value)
         for attr, value in validated_data.items():
-                setattr(instance, attr, value)
+            setattr(instance, attr, value)
         # event = instance.update(**validated_data)
         instance.save()
         return instance

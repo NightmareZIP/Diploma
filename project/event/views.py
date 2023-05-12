@@ -30,11 +30,43 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 
+    def head_or_worker(self):
+        """Проверяем был ли предан id работника в запросе
+
+        Returns:
+            _type_: _description_
+        """
+        user_id = self.request.query_params.get('user_id')
+        print(self.request.query_params)
+
+        if not user_id and 'user_id' in self.request.data:
+            user_id = self.request.data['user_id']
+            # del self.request.data['user_id']
+            print('LLL', self.request.data)
+
+        return user_id
+
     def get_queryset(self):
-        worker_id = get_worker(self.request.user)
-        # TODO Добавить обработку по url дял начальника
-        if worker_id:
-            return self.queryset.filter(created_for=worker_id)
+
+        user_id = self.head_or_worker()
+        print(user_id)
+        if user_id:
+            worker = Worker.objects.all()
+            worker = worker.get(id=user_id)
+            check = [worker.id]
+            if worker.head:
+                check.append(worker.head.id)
+            if (self.request.user.worker_user.id not in check):
+                raise PermissionDenied(
+                    'Вы можете изменять только свой календарь и своих прямых подчиненных')
+            else:
+                return self.queryset.filter(created_for=user_id)
+
+        else:
+            worker_id = get_worker(self.request.user)
+            # TODO Добавить обработку по url дял начальника
+            if worker_id:
+                return self.queryset.filter(created_for=worker_id)
         return False
 
     @action(detail=False)
@@ -48,9 +80,10 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
             _type_: _description_
         """
         # Получим непиродические события
+
         q_set = self.get_queryset()
+
         date_from = self.request.query_params.get('date_from')
-        print('from ', date_from)
         date_from = datetime.strptime(date_from, "%Y-%m-%d")
         date_to = self.request.query_params.get('date_to')
         date_to = datetime.strptime(date_to,  "%Y-%m-%d")
@@ -70,6 +103,7 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
             excl = True
             for day in days:
                 day_from = event.date_from
+                # Убираем Timezone django
                 dif = day_from.replace(tzinfo=None) - day
                 if dif.days % event.period == 0:
                     excl = False
@@ -87,16 +121,30 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     def perform_create(self, serializer):
         # print(self.request.data['event_type'])
         # event_type = EventType.objects.get(id=event_type)
+        user_id = self.head_or_worker()
+        if user_id:
+            created_for = Worker.objects.get(id=user_id)
+        else:
+            created_for = Worker.objects.get(user_id=self.request.user)
+
         created_by = Worker.objects.get(user_id=self.request.user)
+
         serializer.save(created_by=created_by,
-                        created_for=created_by,)
+                        created_for=created_for)
 
     def perform_update(self, serializer):
         # print(self.request.data['event_type'])
         # event_type = EventType.objects.get(id=event_type)
+        user_id = self.head_or_worker()
+        if user_id:
+            created_for = Worker.objects.get(id=user_id)
+        else:
+            created_for = Worker.objects.get(user_id=self.request.user)
+
         created_by = Worker.objects.get(user_id=self.request.user)
+
         serializer.save(created_by=created_by,
-                        created_for=created_by,)
+                        created_for=created_for,)
 
 
 class EventTypeViewSet(mixins.ListModelMixin,

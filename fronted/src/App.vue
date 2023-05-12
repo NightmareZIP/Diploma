@@ -27,6 +27,17 @@ export default {
     const token = this.$store.state.token
     if (token) {
       axios.defaults.headers.common['Authorization'] = "Token " + token
+      axios
+        .get("/api/v1/workers/")
+        .then(response => {
+          console.log(response)
+          let worker = response.data[0]
+          this.$store.commit('setWorker', worker)
+          // this.$router.push('/login')
+        })
+        .catch(error => {
+          console.log(error)
+        })
     } else {
       axios.defaults.headers.common['Authorization'] = ""
     }
