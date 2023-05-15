@@ -1,9 +1,11 @@
 <template>
+  <h1 v-if="(this.$route.params.id)">Календарь коллеги {{ [collegue.name, collegue.last_name,
+  collegue.surname].join(' ') }}</h1>
   <CalendarInput @changeDay="reloadColumns" />
   <CalendarWeek @newEvent="newEvent" @showPopup="showEvent" :key="reload" ref="calendar" :selected="selected_day"
     :concatenatedData="weekData" :precision="precision">
   </CalendarWeek>
-  <EventPopup @close="getEvents();show_popup = false" v-if="show_popup" :event_info="event_info" :is_head="is_head" />
+  <EventPopup @close="getEvents(); show_popup = false" v-if="show_popup" :event_info="event_info" :is_head="is_head" />
 </template>
 
 <script>
@@ -20,7 +22,7 @@ export default {
   components: { CalendarWeek, CalendarInput, EventPopup },
   data() {
     return {
-      // user_id: this.$route.params.id ? this.$route.params.id : 0,
+      collegue: {},
       is_head: false,
       cur_date: new Date(),
       event_info: {
@@ -74,7 +76,8 @@ export default {
         .get(url)
         .then(response => {
           // console.log(this.$store.state.worker.id == response.data.head)
-         this.is_head = this.$store.state.worker.id == response.data.head
+          this.collegue = response.data
+          this.is_head = this.$store.state.worker.id == response.data.head
         })
         .catch(error => {
           console.log(error)

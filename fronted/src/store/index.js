@@ -14,7 +14,7 @@ export default createStore({
       date_end: new Date(),
       period: 0,
       color: '',
-      
+
       type: '',
       event_name: "Новое событие",
       is_new: true,
@@ -38,10 +38,16 @@ export default createStore({
         state.token = ''
         state.isAuthenticated = false
       }
+      state.worker = ''
+
     },
     setToken(state, token) {
       state.token = token
       state.isAuthenticated = true
+    },
+    setWorker(state, worker) {
+      state.worker = worker
+
     },
     removeToken(state) {
       state.user.id = ''

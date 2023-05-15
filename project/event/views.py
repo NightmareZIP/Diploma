@@ -46,7 +46,7 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
         return user_id
 
-    def get_queryset(self):
+    def get_queryset(self, read = False):
 
         user_id = self.head_or_worker()
         print(user_id)
@@ -56,7 +56,7 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
             check = [worker.id]
             if worker.head:
                 check.append(worker.head.id)
-            if (self.request.user.worker_user.id not in check):
+            if (self.request.user.worker_user.id not in check and not read):
                 raise PermissionDenied(
                     'Вы можете изменять только свой календарь и своих прямых подчиненных')
             else:
@@ -81,8 +81,7 @@ class EventViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         """
         # Получим непиродические события
 
-        q_set = self.get_queryset()
-
+        q_set = self.get_queryset(read = True)
         date_from = self.request.query_params.get('date_from')
         date_from = datetime.strptime(date_from, "%Y-%m-%d")
         date_to = self.request.query_params.get('date_to')
