@@ -140,7 +140,7 @@ export default {
     computed: {
         is_head() {
 
-            return this.company_data.head.user_id == this.$store.state.user.id
+            return this.$store.state.worker.is_head
         }
     },
     created() {

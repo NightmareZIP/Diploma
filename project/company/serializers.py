@@ -16,13 +16,13 @@ class WorkerSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    head = WorkerSerializer(required=False, read_only=True)
+    # head = WorkerSerializer(required=False, read_only=True)
 
     class Meta:
         model = Company
         read_only_fields = (
             "created_by",
-            "head",
+            # "head",
             "created_at",
         )
         fields = (
@@ -34,5 +34,5 @@ class CompanySerializer(serializers.ModelSerializer):
             'contact_phone',
             'email',
             'inn',
-            'head',
+            # 'head',
         )

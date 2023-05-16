@@ -16,10 +16,10 @@ class Company(models.Model):
         validators=[phone_regex], unique=True, max_length=12, blank=True)
     email = models.EmailField(unique=True)
 
-    created_by = models.ForeignKey(
-        Worker, related_name='worker_created', on_delete=models.CASCADE)
-    head = models.ForeignKey(
-        Worker, related_name='worker_head', on_delete=models.CASCADE)
+    # created_by = models.ForeignKey(
+    #     Worker, related_name='worker_created', on_delete=models.CASCADE)
+    # head = models.ForeignKey(
+    #     Worker, related_name='worker_head', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

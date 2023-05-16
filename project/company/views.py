@@ -30,8 +30,12 @@ class CompanyViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewset
     def perform_update(self, serializer):
         user = self.request.user
         worker = Worker.objects.get(user_id=user)
-        cmp_head = worker.company.head.id
-        if worker.id != cmp_head:
+        cmp_head = worker.is_head
+
+        cmp_id = int(self.request.parser_context['kwargs']['pk'])
+        print([cmp_head, worker.company.id, cmp_id])
+
+        if not cmp_head or worker.company.id != cmp_id:
             raise PermissionDenied('Wrong object owner')
 
         serializer.save()
