@@ -21,36 +21,14 @@ export default {
   },
   computed: {
     getColor() {
-      const getContrastColor = color => {
-        // Counting the perceptive luminance - human eye favors green color...
-        const R = parseInt(color[1] + color[2], 16)
-        const G = parseInt(color[3] + color[4], 16)
-        const B = parseInt(color[5] + color[6], 16)
 
-        const luminance = (0.299 * R + 0.587 * G + 0.114 * B) / 255
-
-        return luminance > 0.5 ? "#454545" : "#FFFFFF"
+      return {
+        backgroundColor: this.data.color,
+        color: 'white'
       }
-      console.log(this.data)
-      if (Array.isArray(this.data.color)) {
-        return { background: this.multicolor(this.data.color) }
-      } else
-        return {
-          backgroundColor: this.data.color,
-          color: getContrastColor(this.data.color)
-        }
     }
   },
   methods: {
-    multicolor(c) {
-      let string = "repeating-linear-gradient(45deg"
-      let stripe = 50 / c.length
-      for (var i = 0; i < c.length; i++) {
-        string += `,${c[i]} ${stripe * i}%, ${c[i]} ${stripe * (i + 1)}%`
-      }
-      string += ")"
-      return string
-    },
 
     timeToPercent(t) {
       //set top position of event block
@@ -65,9 +43,9 @@ export default {
       return outputX + "%"
     },
 
-    getPos({ start, end, indent, index, indexOf }) {
-      //set events into position with indent index absolute position
-
+    getPos({ start, end, index, indexOf }) {
+      // Рассчитывает позицию события относительно его вермени, а так же наличия
+      // событий пересекающихся с ним по времени
       let offset = start.getMinutes() + start.getHours() * 60
       let duration = fn.diffMinutes(start, end)
 
@@ -81,34 +59,14 @@ export default {
         }
       }
       let width = 90
-
+      //Индекс элемента указывает количество пересекающихся событий
       if (index !== null) width = width / indexOf
-      let indentSize = 5
-
-      let left = indent * indentSize
+      let left = 0
+      //Рассчитываем отступ
       if (index !== null) {
         left = left + width * (index - 1)
       }
-      if (indent > 0 && index == null) width = width - indent * indentSize
-      if (indent > 0 && index !== null) {
-        width = (95 - indent * (indentSize + 1)) / indexOf
 
-        left = indent * (indentSize + 1) + width * (index - 1)
-      }
-
-      let indentreset = 4
-
-      if (indent > indentreset && index == null) {
-        left = indentSize * (indent % indentreset)
-        width = 95
-      }
-
-      if (indent > indentreset && index !== null) {
-        width = (95 - (indent % indentreset) * (indentSize + 1)) / indexOf
-        left =
-          (indent % indentreset) * (indentSize + 1) +
-          width * ((index % indentreset) - 1)
-      }
 
       return {
         position: "absolute",

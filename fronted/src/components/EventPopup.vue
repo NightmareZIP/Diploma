@@ -25,7 +25,7 @@
 
                         <div class="control">
                             <p>
-                                {{ [event_info.created_by.name, event_info.created_by.last_name,
+                                {{ [event_info.created_by.last_name, event_info.created_by.name,
                                 event_info.created_by.surname].join(' ') }}
                             </p>
                         </div>
@@ -87,20 +87,6 @@
                     </div>
 
                 </div>
-                <!-- <div class="field has-text-left ">
-                    <label class="label ">Участники:</label>
-                    <div class="control">
-                        <div class="content">
-
-                            <ol v-if="event_info.is_new" type="1">
-                                <li v-for="(member, index) in workers" v-bind:key="index">{{ member }}</li>
-                            </ol>
-                            <ol type="1">
-                                <li v-for="(member, index) in event_info.members" v-bind:key="index">{{ member }}</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div> -->
                 <div class="notification is-danger" v-if="error">
                     <p>Убедитесь, что поля заоплнены корректно</p>
                 </div>
@@ -128,19 +114,6 @@ export default {
     props: {
         is_head: false,
         event_info: {},
-        // $store.state.event_info: {
-        //     // date_from,
-        //     // date_to,
-        //     // period,
-        //     // is_new,
-        //     // type,
-        //     // color,
-        //     // event_name,
-        //     // can_edit,
-        //     // created_by,
-        //     // members,
-        // }
-
 
     },
     data() {

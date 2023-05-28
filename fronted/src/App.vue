@@ -1,4 +1,6 @@
 <template>
+  <!-- Выводим элементы навигации роутера, так же проверяем, аторизован ли пользователь для отобра
+  жения каждого из элементов -->
   <nav>
     <router-link to="/">Главная страница|</router-link>
     <router-link to="/my-calendar" v-if=$store.state.isAuthenticated>Мой календарь|</router-link>
@@ -18,15 +20,21 @@
 
 <script>
 import axios from 'axios'
+// Прописываем информаию о комопненте и логику его работы
 export default {
+  //Имя комопнента
   name: 'App',
+  //Логика выполняемая перед созданием компонента при его вызове
   beforeCreate() {
+    //Инициализируем хранилища приложения
     this.$store.commit('initializeStore')
-
-
+    //Получаем токен авторизации их хранилища браузера
     const token = this.$store.state.token
     if (token) {
+      //Если токен существует, то записываем это в данные хранилища, и передаем его в axios
+      // по умолчанию при отправке запросов
       axios.defaults.headers.common['Authorization'] = "Token " + token
+      // Шлем запрос для получения информации о сотруднике и так же записывае информацию в хранилище
       axios
         .get("/api/v1/workers/")
         .then(response => {
@@ -45,10 +53,13 @@ export default {
     // console.log(Object.values(this.$store.state.user));
   },
   methods: {
+    //Прописываем метод для разавторизации пользователя
     logout() {
+      //Передаем на сервер, что мы выходим из учетной записи и токен должен стать неактивным
       axios
         .post("/api/v1/token/logout/")
         .then(response => {
+          //Очищаем информацию о токене на стороне пользователя
           axios.defaults.headers.common["Authorization"] = ""
           localStorage.removeItem("username")
           localStorage.removeItem("userid")
@@ -69,6 +80,7 @@ export default {
   }
 }
 </script>
+<!-- Подключаем стили -->
 <style lang="scss">
 @import "../node_modules/bulma";
 

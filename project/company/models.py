@@ -1,3 +1,4 @@
+#подключаем библиотеки
 from django.db import models
 from django.contrib.auth.models import User
 from worker.models import Worker
@@ -5,6 +6,15 @@ from django.core.validators import RegexValidator
 
 
 class Company(models.Model):
+    """Сущнсоть компании
+
+    Args:
+        массив аргументов сщунсоти
+
+    Returns:
+        Объект Model
+    """
+    #создание аргумента сущности
     name = models.CharField(max_length=255, unique=True)
     place = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -15,12 +25,12 @@ class Company(models.Model):
     contact_phone = models.CharField(
         validators=[phone_regex], unique=True, max_length=12, blank=True)
     email = models.EmailField(unique=True)
-
-    # created_by = models.ForeignKey(
-    #     Worker, related_name='worker_created', on_delete=models.CASCADE)
-    # head = models.ForeignKey(
-    #     Worker, related_name='worker_head', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        """_summary_
+
+        Returns:
+            string: наименование экземпляра в сущности для админ панели
+        """
         return '%s' % self.name

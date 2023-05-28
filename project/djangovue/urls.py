@@ -24,8 +24,4 @@ urlpatterns = [
     path('api/v1/', include('worker.urls')),
     path('api/v1/', include('event.urls')),
     path('api/v1/', include('company.urls')),
-
-
-
-
 ]

@@ -50,40 +50,34 @@ export default {
   computed: {
     positioning() {
       if (!this.data) return []
-      console.log(this.data)
-      return [...this.data]
+      return [...this.data] // Сортируем события по их дате начала
         .sort((a, b) =>
           fn.isSame(a.grid.start, b.grid.start)
             ? b.grid.dur - a.grid.dur
             : fn.diffMinutes(a.grid.start, b.grid.start)
         )
+        // Ищем пересекающиеся события
         .map(item => {
-          let block = this.data.filter(
-            elem =>
-              fn.isBefore(elem.grid.start, item.grid.start) &&
-              fn.isAfter(elem.grid.end, item.grid.start)
-          )
-          if (block.length == 0) {
-            item.grid["indent"] = 0
-          } else {
-            let maxindent = 1
-
-            block.forEach(i => {
-              if (i.grid.indent)
-                if (i.grid.indent >= maxindent) maxindent = i.grid.indent + 1
-            })
-
-            item.grid["indent"] = maxindent
-          }
 
           let same = this.data.filter(i =>
-            fn.isSame(i.grid.start, item.grid.start)
+            (fn.isSame(i.grid.start, item.grid.start) &&
+              fn.isSame(i.grid.end, item.grid.end)
+            ) ||
+            (
+              fn.isBefore(i.grid.start, item.grid.start) &&
+              !fn.isBefore(i.grid.end, item.grid.start)
+            ) ||
+            (
+              fn.isAfter(i.grid.start, item.grid.start)
+            )
           )
-
+          //Если нет пересекающихся событий, помечаем, что пересечения нет
           if (same.length <= 1) {
             item.grid["index"] = null
             item.grid["indexOf"] = null
           } else {
+            // Иначае присваиваем каждому событию его порядковый номер, для последующего сдвига в верстке
+            //Чтобы события не перекрывали друг друга
             let index = 1
 
             same.forEach(i => {

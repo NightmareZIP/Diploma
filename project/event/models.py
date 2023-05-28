@@ -1,8 +1,10 @@
+#подключаем библиотеки
 from django.db import models
 from worker.models import Worker
 
 
 class EventType(models.Model):
+
     color = models.CharField(max_length=10)
     name = models.CharField(max_length=255)
 

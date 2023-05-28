@@ -1,20 +1,22 @@
+// Подключение компонентов
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import Register from '../views/Register.vue'
 import CompanyRegister from '../views/CompanyRegister.vue'
-
+import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 import Calendar from '../views/Calendar.vue'
 import Profile from '../views/Profile.vue'
 import CompanyInfo from '../views/CompanyInfo.vue'
 import Workers from '../views/Workers.vue'
 
-
+// Объявление объекта роутера
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: '/', //Задаем путь подлкючения
+    name: 'home', //Задаем имя, для возможности простого поиска данной настрйоки 
+    component: HomeView, //Задаем название компонента, который необходимо подключить
+    meta: { requiresAuth: false }, // Помечаем, что для посещения страницы не нужна авторизация
+
   },
   {
     path: '/register/:companyid',
@@ -30,14 +32,15 @@ const routes = [
   {
     path: '/my-calendar',
     name: 'my-calendar',
+    meta: { requiresAuth: true },
 
     component: Calendar
   },
-  
+
   {
     path: '/my-calendar/:id',
     name: 'my-calendar-id',
-
+    meta: { requiresAuth: true },
     component: Calendar
   },
 
@@ -51,6 +54,7 @@ const routes = [
   {
     path: '/profile',
     name: 'profile',
+    meta: { requiresAuth: true },
 
     component: Profile
   },
@@ -58,37 +62,31 @@ const routes = [
   {
     path: '/company-info',
     name: 'company-info',
+    meta: { requiresAuth: true },
 
     component: CompanyInfo
   },
   {
     path: '/workers',
     name: 'workers',
+    meta: { requiresAuth: true },
 
     component: Workers
   },
-  
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
 
 ]
 
+// Создаем объект роутера
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
+//Пероверка, требуется ли авторизация для просмотра страницы
 router.beforeEach((to, from) => {
   if (to.meta.requireLogin && !store.state.isAuthenticated) {
     return {
       path: '/login',
-      // save the location we were at to come back later
       query: { redirect: to.fullPath },
     }
   }

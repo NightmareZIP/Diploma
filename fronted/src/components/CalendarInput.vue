@@ -42,15 +42,15 @@ export default {
         }
     },
     mounted() {
-        
+
     },
     methods: {
+        // Смена дня
         change_active(event, day_el) {
             this.date = day_el.date;
             this.$emit('changeDay', day_el)
-
-
         },
+        //Предыдущий месяц
         decrease() {
             this.month--;
             if (this.month < 0) {
@@ -60,6 +60,7 @@ export default {
             }
 
         },
+        // Следующий месяц
         increase() {
 
             this.month++;
@@ -70,29 +71,31 @@ export default {
         },
     },
     computed: {
+        //дни месяца
         calendar() {
             this.date.setHours(0, 0, 0, 0)
             let days = []
             let week = 0
             days[week] = []
+            //последний день месяца
             let last_day = new Date(this.year, this.month + 1, 0).getDate();
+            //Проходим по всем дням месяца
             for (let i = 1; i <= last_day; i++) {
+                //определяем является ли день понедельником
                 if (new Date(this.year, this.month, i).getDay() == this.dFirstMonth) {
                     week++;
                     days[week] = [];
                 }
-
+                //Помечаем выбранный день
                 let a = { index: i, date: new Date(this.year, this.month, i) }
-                // console.log(i)
-                // console.log([a.date.valueOf()==this.date.valueOf()])
                 if (a.date.valueOf() == this.date.valueOf()) {
                     this.date = a.date
                 }
+                //добавляем день в его неделю
                 days[week].push(a)
                 if ((i == new Date().getDate()) && (this.year == new Date().getFullYear()) && (this.month == new Date().getMonth())) { a.current = '#747ae6' }
-                if (new Date(this.year, this.month, i).getDay() == 6 || new Date(this.year, this.month, i).getDay() == 0) { a.weekend = '#ff0000' }
             }
-
+            //Не выводим дни прошлого месяца, вместо этого заполняем их пустыми значениями
             if (days[0].length > 0) {
                 for (let i = days[0].length; i < 7; i++) {
                     days[0].unshift('')

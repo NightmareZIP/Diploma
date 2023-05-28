@@ -15,21 +15,15 @@ export default {
     components: { CalendarColumn },
     data() {
         return {
-
-            // selected: { type: Date, default: () => new Date() },
         }
     },
     props: {
         concatenatedData: { default: {} },
         selected: new Date(),
         precision: { type: Number },
-
-        // precision: { type: Number, default: 30 },
-
-        // data: Array,
-        // selected: { type: Date, default: () => new Date() }
     },
     computed: {
+        //Разбиваем события по дням недели
         days() {
             let result = []
             console.log(this.selected);

@@ -4,27 +4,19 @@ from .models import Company
 from worker.models import Worker
 
 
-class WorkerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Worker
-        read_only_fields = (
-            "created_at",
-            # "head",
-            "company",
-        ),
-        fields = "__all__"
-
-
 class CompanySerializer(serializers.ModelSerializer):
-    # head = WorkerSerializer(required=False, read_only=True)
-
+    """Класс сериалайзера компании
+    """
     class Meta:
+        #Сущность
         model = Company
+        #поля доступные только для чтения
         read_only_fields = (
             "created_by",
             # "head",
             "created_at",
         )
+        #Список полей, обрабатывыемых сериалайзером
         fields = (
             'id',
             'name',
